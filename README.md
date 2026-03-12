@@ -9,40 +9,50 @@ Hệ thống giám sát môi trường được xây dựng trên **BeagleBone B
 ### Sơ Đồ Kiến Trúc
 
 ```mermaid
-graph TB
+flowchart TB
+    %% Định nghĩa Style (Minimalist & Professional)
+    classDef userApp fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+    classDef devNode fill:#fff8e1,stroke:#ff8f00,stroke-width:2px,color:#000
+    classDef kernelDrv fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000
+    classDef bus fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,color:#000
+    classDef hw fill:#eceff1,stroke:#37474f,stroke-width:2px,color:#000
+    classDef layer fill:none,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5
+
     subgraph UserSpace["User Space"]
-        App["env_monitor_app"]
-        DevSHT30["/dev/sht30_sensor"]
-        DevBH1750["/dev/bh1750_sensor"]
-        DevOLED["/dev/oled_ssd1306"]
+        App("env_monitor_app"):::userApp
+        DevSHT30[["/dev/sht30_sensor"]]:::devNode
+        DevBH1750[["/dev/bh1750_sensor"]]:::devNode
+        DevOLED[["/dev/oled_ssd1306"]]:::devNode
     end
 
     subgraph KernelSpace["Kernel Space"]
-        I2CDriver["I2C Character Driver<br/>sht30_i2c_driver.ko<br/>bh1750_driver.ko"]
-        SPIDriver["SPI Character Driver<br/>ssd1306_spi_driver.ko"]
+        I2CDriver("I2C + Character Driver<br>sht30_i2c_driver.ko<br>bh1750_driver.ko"):::kernelDrv
+        SPIDriver("SPI + Character Driver<br>ssd1306_spi_driver.ko"):::kernelDrv
     end
 
-    subgraph Hardware["Hardware"]
-        I2C2["I2C2 Bus"]
-        SPI1["SPI1 Bus"]
-        SHT30["GY-SHT30-D<br/>Temp/Humidity"]
-        BH1750["BH1750<br/>Light Sensor"]
-        OLED["OLED 0.96 inch<br/>SSD1306"]
+    subgraph HardwareSpace["Hardware"]
+        I2C2{{"I2C2 Bus"}}:::bus
+        SPI1{{"SPI1 Bus"}}:::bus
+        SHT30[/"GY-SHT30-D<br>Temp/Humidity"/]:::hw
+        BH1750[/"BH1750<br>Light Sensor"/]:::hw
+        OLED[/"OLED 0.96 inch<br>SSD1306"/]:::hw
     end
 
-    App -->|read| DevSHT30
-    App -->|read| DevBH1750
-    App -->|write| DevOLED
+    %% Apply style cho các subgraph
+    class UserSpace,KernelSpace,HardwareSpace layer
 
-    DevSHT30 --> I2CDriver
-    DevBH1750 --> I2CDriver
-    DevOLED --> SPIDriver
+    %% Luồng giao tiếp
+    App -- "read" --> DevSHT30 & DevBH1750
+    App -- "write" --> DevOLED
+
+    DevSHT30 -- "read()" --> I2CDriver
+    DevBH1750 -- "read()" --> I2CDriver
+    DevOLED -- "write()" --> SPIDriver
 
     I2CDriver --> I2C2
-    SPIDriver --> SPI1
+    SPIDriver <--> SPI1
 
-    I2C2 --> SHT30
-    I2C2 --> BH1750
+    I2C2 --> SHT30 & BH1750
     SPI1 --> OLED
 ```
 
@@ -203,7 +213,3 @@ Mỗi driver đều có file `device_tree.txt` chứa cấu hình Device Tree c�
 ## Tác Giả
 
 Dự án được phát triển hoàn toàn từ đầu, không sử dụng vendor libraries hay pre-built drivers.
-
-## License
-
-[Thêm license của bạn ở đây]
