@@ -1,2 +1,0 @@
-/home/haidoan2098/workspace/environmental_monitoring_system/kernel_module_drivers/bh1750/driver/bh1750_driver.o
-

@@ -1,1 +1,0 @@
-cmd_/home/haidoan2098/workspace/environmental_monitoring_system/kernel_module_drivers/bh1750/driver/modules.order := {   echo /home/haidoan2098/workspace/environmental_monitoring_system/kernel_module_drivers/bh1750/driver/bh1750_driver.ko; :; } | awk '!x[$$0]++' - > /home/haidoan2098/workspace/environmental_monitoring_system/kernel_module_drivers/bh1750/driver/modules.order

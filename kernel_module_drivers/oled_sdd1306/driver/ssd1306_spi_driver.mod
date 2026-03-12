@@ -1,2 +1,0 @@
-/home/haidoan2098/workspace/environmental_monitoring_system/kernel_module_drivers/oled_sdd1306/driver/ssd1306_spi_driver.o
-
