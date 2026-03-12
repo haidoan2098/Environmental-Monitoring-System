@@ -1,8 +1,8 @@
 #include "display_data.h"
-#include <stdio.h>
-#include <fcntl.h>     // open(), close()
-#include <unistd.h>    // read(), write()
-#include <string.h>    // strlen()
+#include <iostream>
+#include <cstring>
+#include <fcntl.h>
+#include <unistd.h>
 
 #define OLED_FILE_PATH   "/dev/oled_ssd1306"
 #define BH1750_FILE_PATH "/dev/bh1750_sensor"
@@ -22,7 +22,7 @@ static int read_bh1750(void)
 {
     int fd = open(BH1750_FILE_PATH, O_RDONLY);
     if (fd < 0) {
-        perror("open /dev/bh1750_sensor");
+        std::cerr << "open " << BH1750_FILE_PATH << ": " << strerror(errno) << std::endl;
         return -1;
     }
 
@@ -30,12 +30,12 @@ static int read_bh1750(void)
     close(fd);  
     
     if (ret < 0) {
-        perror("read /dev/bh1750_sensor");
+        std::cerr << "read " << BH1750_FILE_PATH << ": " << strerror(errno) << std::endl;
         return -1;
     }
     
     if (ret == 0) {
-        fprintf(stderr, "read /dev/bh1750_sensor: no data available\n");
+        std::cerr << "read " << BH1750_FILE_PATH << ": no data available" << std::endl;
         return -1;
     }
 
@@ -48,7 +48,7 @@ static int read_sht30(void)
 {
     int fd = open(SHT30_FILE_PATH, O_RDONLY);
     if (fd < 0) {
-        perror("open /dev/sht30_sensor");
+        std::cerr << "open " << SHT30_FILE_PATH << ": " << strerror(errno) << std::endl;
         return -1;
     }
 
@@ -56,12 +56,12 @@ static int read_sht30(void)
     close(fd); 
     
     if (ret < 0) {
-        perror("read /dev/sht30_sensor");
+        std::cerr << "read " << SHT30_FILE_PATH << ": " << strerror(errno) << std::endl;
         return -1;
     }
     
     if (ret == 0) {
-        fprintf(stderr, "read /dev/sht30_sensor: no data available\n");
+        std::cerr << "read " << SHT30_FILE_PATH << ": no data available" << std::endl;
         return -1;
     }
 
@@ -74,7 +74,7 @@ static int write_oled(const char *str_display)
 {
     int fd = open(OLED_FILE_PATH, O_WRONLY);
     if (fd < 0) {
-        perror("open /dev/oled_ssd1306");
+        std::cerr << "open " << OLED_FILE_PATH << ": " << strerror(errno) << std::endl;
         return -1;
     }
 
@@ -82,7 +82,7 @@ static int write_oled(const char *str_display)
     close(fd);  
     
     if (ret < 0) {
-        perror("write /dev/oled_ssd1306");
+        std::cerr << "write " << OLED_FILE_PATH << ": " << strerror(errno) << std::endl;
         return -1;
     }
 
@@ -108,7 +108,7 @@ void display_data(void)
     snprintf(buf_ssd1306, sizeof(buf_ssd1306), "%s-%s", buf_sht30, buf_bh1750);
     
     if (write_oled(buf_ssd1306) != 0) {
-        fprintf(stderr, "write_oled failed\n");
+        std::cerr << "write_oled failed" << std::endl;
     }
 }
 
